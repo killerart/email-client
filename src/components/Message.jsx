@@ -5,8 +5,8 @@ import Loader from 'react-loader-spinner';
 import { Col, Row } from 'reactstrap';
 import ReactHtmlParser from 'react-html-parser';
 import { MDBAnimation } from 'mdbreact';
-import { Actions } from '../../utils/ipcCommunication';
-import './index.css';
+import { IpcActions } from '../lib/IpcActions';
+import '../styles/Message.css';
 
 export default function Message({ credentials, match, logout }) {
   const [message, setMessage] = useState();
@@ -15,7 +15,7 @@ export default function Message({ credentials, match, logout }) {
     const { uid } = match.params;
 
     ipcRenderer
-      .invoke(Actions.GET_MESSAGE, credentials, uid)
+      .invoke(IpcActions.GET_MESSAGE, credentials, uid)
       .then((message) => {
         if (message.html) {
           message.html = message.html.replace(
@@ -63,10 +63,10 @@ export default function Message({ credentials, match, logout }) {
         </MDBAnimation>
       ) : (
         <Loader
-          width={240}
-          height={240}
+          width={100}
+          height={100}
           color="gray"
-          type="Rings"
+          type="Grid"
           className="page-absolute-center"
         />
       )}

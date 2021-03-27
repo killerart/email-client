@@ -14,10 +14,10 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Mail from 'nodemailer/lib/mailer';
+import SmtpClient, { SmtpCredentials } from './lib/SmtpClient';
+import ImapClient, { ImapCredentials } from './lib/ImapClient';
+import { IpcActions } from './lib/IpcActions';
 import MenuBuilder from './menu';
-import { Actions } from './utils/ipcCommunication';
-import ImapClient, { ImapCredentials } from './network/ImapClient';
-import SmtpClient, { SmtpCredentials } from './network/SmtpClient';
 
 export default class AppUpdater {
   constructor() {
@@ -142,10 +142,10 @@ app.on('activate', () => {
  * Network events...
  */
 ipcMain.handle(
-  Actions.GET_ALL_MESSAGES,
+  IpcActions.GET_ALL_MESSAGES,
   async (event, credentials: ImapCredentials) => {
     await imapClient.openConnection(credentials, (message) =>
-      event.sender.send(Actions.NEW_MESSAGE, message)
+      event.sender.send(IpcActions.NEW_MESSAGE, message)
     );
 
     const messages = await imapClient.listMessages(-100);
@@ -153,9 +153,9 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(Actions.GET_MESSAGE, async (event, credentials, uid) => {
+ipcMain.handle(IpcActions.GET_MESSAGE, async (event, credentials, uid) => {
   await imapClient.openConnection(credentials, (message) =>
-    event.sender.send(Actions.NEW_MESSAGE, message)
+    event.sender.send(IpcActions.NEW_MESSAGE, message)
   );
 
   const message = await imapClient.getMessage(uid);
@@ -164,7 +164,7 @@ ipcMain.handle(Actions.GET_MESSAGE, async (event, credentials, uid) => {
 });
 
 ipcMain.handle(
-  Actions.SEND_MESSAGE,
+  IpcActions.SEND_MESSAGE,
   (_event, credentials: SmtpCredentials, message: Mail.Options) => {
     smtpClient.openConnection(credentials);
 
@@ -173,7 +173,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(Actions.LOGOUT, () => {
+ipcMain.handle(IpcActions.LOGOUT, () => {
   imapClient.closeConnection();
   smtpClient.closeConnection();
 });

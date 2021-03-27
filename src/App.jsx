@@ -6,9 +6,9 @@ import Sidebar from './components/Sidebar';
 import Logout from './components/Logout';
 import Message from './components/Message';
 import Send from './components/Send';
-import useCredentials from './utils/useCredentials';
-import { Actions } from './utils/ipcCommunication';
-import './App.css';
+import { IpcActions } from './lib/IpcActions';
+import useCredentials from './hooks/useCredentials';
+import './styles/App.css';
 
 function App() {
   const [credentials, setCredentials, removeCredentials] = useCredentials();
@@ -17,7 +17,7 @@ function App() {
 
   const logout = useCallback(
     (errorMessage) => {
-      ipcRenderer.invoke(Actions.LOGOUT);
+      ipcRenderer.invoke(IpcActions.LOGOUT);
       removeCredentials();
       setErrorMessage(errorMessage);
       setSelectedMessageUID(undefined);

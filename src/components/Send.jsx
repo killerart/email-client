@@ -3,8 +3,8 @@ import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MDBAnimation, MDBInput, MDBBtn } from 'mdbreact';
 import { Row, Col, Form } from 'reactstrap';
-import { Actions } from '../../utils/ipcCommunication';
-import './index.css';
+import { IpcActions } from '../lib/IpcActions';
+import '../styles/Send.css';
 
 export default function Send({ credentials, logout }) {
   const [sent, setSent] = useState();
@@ -17,7 +17,7 @@ export default function Send({ credentials, logout }) {
       event.preventDefault();
       const message = { to, subject, text };
       ipcRenderer
-        .invoke(Actions.SEND_MESSAGE, credentials, message)
+        .invoke(IpcActions.SEND_MESSAGE, credentials, message)
         .then(() => setSent(true))
         .catch((error) => {
           logout(error.message);

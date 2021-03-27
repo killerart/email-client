@@ -1,4 +1,4 @@
-export enum Actions {
+export enum IpcActions {
   GET_ALL_MESSAGES = 'GET_ALL_MESSAGES',
   GET_MESSAGE = 'GET_MESSAGE',
   NEW_MESSAGE = 'NEW_MESSAGE',
@@ -6,4 +6,4 @@ export enum Actions {
   SEND_MESSAGE = 'SEND_MESSAGE',
 }
 
-export default Actions;
+export default IpcActions;

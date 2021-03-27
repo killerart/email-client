@@ -18,11 +18,11 @@ import {
   MDBNavLink,
   MDBAnimation,
 } from 'mdbreact';
-import './index.css';
 import { ipcRenderer } from 'electron';
 import Loader from 'react-loader-spinner';
 import { withRouter } from 'react-router';
-import { Actions } from '../../utils/ipcCommunication';
+import { IpcActions } from '../lib/IpcActions';
+import '../styles/Sidebar.css';
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -35,17 +35,17 @@ class Sidebar extends React.Component {
   componentDidMount() {
     const { credentials } = this.props;
     ipcRenderer
-      .invoke(Actions.GET_ALL_MESSAGES, credentials)
+      .invoke(IpcActions.GET_ALL_MESSAGES, credentials)
       .then((parsedMessages) => {
         this.setState({ messages: parsedMessages ?? [] });
       })
       .catch(this.onError);
 
-    ipcRenderer.on(Actions.NEW_MESSAGE, this.onNewMessage);
+    ipcRenderer.on(IpcActions.NEW_MESSAGE, this.onNewMessage);
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeListener(Actions.NEW_MESSAGE, this.onNewMessage);
+    ipcRenderer.removeListener(IpcActions.NEW_MESSAGE, this.onNewMessage);
   }
 
   onNewMessage = (event, message) => {
