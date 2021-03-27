@@ -1,0 +1,52 @@
+.sidenav {
+  width: 286px;
+  height: 100vh;
+  position: fixed;
+  z-index: 5;
+}
+
+.page-content {
+  margin-left: 286px;
+  height: calc(100% - 59px);
+}
+
+.card {
+  color: #212529;
+}
+
+.unseen-mask {
+  opacity: 0.8 !important;
+}
+
+.unseen-mask:hover,
+.selected-mask {
+  opacity: 1 !important;
+}
+
+.selected-mask {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.absolute-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.absolute-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  width: 100%;
+}
+
+.card-selectable-text {
+  position: relative;
+  z-index: 7;
+  cursor: text;
+}

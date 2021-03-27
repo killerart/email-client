@@ -1,0 +1,9 @@
+export enum Actions {
+  GET_ALL_MESSAGES = 'GET_ALL_MESSAGES',
+  GET_MESSAGE = 'GET_MESSAGE',
+  NEW_MESSAGE = 'NEW_MESSAGE',
+  LOGOUT = 'LOGOUT',
+  SEND_MESSAGE = 'SEND_MESSAGE',
+}
+
+export default Actions;
