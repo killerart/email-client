@@ -24,7 +24,7 @@ export default class ImapClient {
 
   public openConnection(
     credentials: ImapCredentials,
-    onNewMessageCallback: (message: MessageHeaders) => void
+    onNewMessageCallback?: (message: MessageHeaders) => void
   ) {
     if (this.imap) return Promise.resolve();
 
@@ -45,7 +45,7 @@ export default class ImapClient {
       });
 
       this.imap.on('new', (message: MessageHeaders) => {
-        onNewMessageCallback(message);
+        onNewMessageCallback?.(message);
       });
 
       this.imap.connect();

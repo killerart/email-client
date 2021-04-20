@@ -11,18 +11,18 @@ import useCredentials from './hooks/useCredentials';
 import './styles/App.css';
 
 function App() {
-  const [credentials, setCredentials, removeCredentials] = useCredentials();
+  const [credentials, setCredentials] = useCredentials();
   const [selectedMessageUID, setSelectedMessageUID] = useState();
   const [errorMessage, setErrorMessage] = useState();
 
   const logout = useCallback(
     (errorMessage) => {
       ipcRenderer.invoke(IpcActions.LOGOUT);
-      removeCredentials();
+      setCredentials(undefined);
       setErrorMessage(errorMessage);
       setSelectedMessageUID(undefined);
     },
-    [removeCredentials]
+    [setCredentials]
   );
 
   if (!credentials) {
