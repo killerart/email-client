@@ -10,7 +10,13 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  IpcMainInvokeEvent,
+  shell,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Mail from 'nodemailer/lib/mailer';
@@ -117,15 +123,57 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
-const imapClient = new ImapClient();
-const smtpClient = new SmtpClient();
+
+async function getAllMessages(
+  event: IpcMainInvokeEvent,
+  credentials: ImapCredentials
+) {
+  const imapClient = ImapClient.getInstance();
+  await imapClient.openConnection(credentials, (message) =>
+    event.sender.send(IpcActions.NEW_MESSAGE, message)
+  );
+
+  const messages = await imapClient.listMessages(-100);
+  return messages.reverse();
+}
+
+async function getMessage(
+  event: IpcMainInvokeEvent,
+  credentials: ImapCredentials,
+  uid: number
+) {
+  const imapClient = ImapClient.getInstance();
+  await imapClient.openConnection(credentials, (message) =>
+    event.sender.send(IpcActions.NEW_MESSAGE, message)
+  );
+
+  const message = await imapClient.getMessage(uid);
+  await imapClient.addSeenFlag(uid);
+  return message;
+}
+
+function sendMessage(
+  _: IpcMainInvokeEvent,
+  credentials: SmtpCredentials,
+  message: Mail.Options
+) {
+  const smtpClient = SmtpClient.getInstance();
+  smtpClient.openConnection(credentials);
+
+  message.from = credentials.email;
+  return smtpClient.sendMail(message);
+}
+
+function closeConnections() {
+  ImapClient.getInstance().closeConnection();
+  SmtpClient.getInstance().closeConnection();
+}
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
-    imapClient.closeConnection();
-    smtpClient.closeConnection();
+    closeConnections();
     app.quit();
   }
 });
@@ -141,39 +189,10 @@ app.on('activate', () => {
 /**
  * Network events...
  */
-ipcMain.handle(
-  IpcActions.GET_ALL_MESSAGES,
-  async (event, credentials: ImapCredentials) => {
-    await imapClient.openConnection(credentials, (message) =>
-      event.sender.send(IpcActions.NEW_MESSAGE, message)
-    );
+ipcMain.handle(IpcActions.GET_ALL_MESSAGES, getAllMessages);
 
-    const messages = await imapClient.listMessages(-100);
-    return messages.reverse();
-  }
-);
+ipcMain.handle(IpcActions.GET_MESSAGE, getMessage);
 
-ipcMain.handle(IpcActions.GET_MESSAGE, async (event, credentials, uid) => {
-  await imapClient.openConnection(credentials, (message) =>
-    event.sender.send(IpcActions.NEW_MESSAGE, message)
-  );
+ipcMain.handle(IpcActions.SEND_MESSAGE, sendMessage);
 
-  const message = await imapClient.getMessage(uid);
-  await imapClient.addSeenFlag(uid);
-  return message;
-});
-
-ipcMain.handle(
-  IpcActions.SEND_MESSAGE,
-  (_event, credentials: SmtpCredentials, message: Mail.Options) => {
-    smtpClient.openConnection(credentials);
-
-    message.from = credentials.email;
-    return smtpClient.sendMail(message);
-  }
-);
-
-ipcMain.handle(IpcActions.LOGOUT, () => {
-  imapClient.closeConnection();
-  smtpClient.closeConnection();
-});
+ipcMain.handle(IpcActions.LOGOUT, closeConnections);

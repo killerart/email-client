@@ -2,15 +2,26 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
-export interface SmtpCredentials {
+interface SmtpCredentials {
   email: string;
   password: string;
   smtpServer: string;
   smtpPort: number;
 }
 
-export default class SmtpClient {
+class SmtpClient {
+  private static instance?: SmtpClient;
+
   private smtp?: Transporter;
+
+  private constructor() {
+    this.smtp = undefined;
+  }
+
+  public static getInstance(): SmtpClient {
+    SmtpClient.instance = SmtpClient.instance ?? new SmtpClient();
+    return SmtpClient.instance;
+  }
 
   public openConnection(credentials: SmtpCredentials) {
     if (this.smtp) return;
@@ -41,3 +52,6 @@ export default class SmtpClient {
     return this.smtp.sendMail(mailOptions);
   }
 }
+
+export { SmtpCredentials };
+export default SmtpClient;

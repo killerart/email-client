@@ -2,13 +2,13 @@
 import inbox from 'inbox-2';
 import { ParsedMail, simpleParser } from 'mailparser';
 
-export interface ImapCredentials {
+interface ImapCredentials {
   email: string;
   password: string;
   imapServer: string;
 }
 
-export interface MessageHeaders {
+interface MessageHeaders {
   UID: number;
   flags: string[];
   date: Date;
@@ -19,8 +19,19 @@ export interface MessageHeaders {
   };
 }
 
-export default class ImapClient {
+class ImapClient {
+  private static instance?: ImapClient;
+
   private imap: any;
+
+  private constructor() {
+    this.imap = undefined;
+  }
+
+  public static getInstance() {
+    ImapClient.instance = ImapClient.instance ?? new ImapClient();
+    return ImapClient.instance;
+  }
 
   public openConnection(
     credentials: ImapCredentials,
@@ -108,3 +119,6 @@ export default class ImapClient {
     });
   }
 }
+
+export { ImapCredentials };
+export default ImapClient;
