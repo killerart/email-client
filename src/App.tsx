@@ -22,11 +22,11 @@ function App() {
     [setCredentials]
   );
 
-  let loginState: IAppStrategy;
+  let loginStrategy: IAppStrategy;
   if (credentials) {
-    loginState = new LoggedInStrategy();
+    loginStrategy = new LoggedInStrategy();
   } else {
-    loginState = new NotLoggedInStrategy();
+    loginStrategy = new NotLoggedInStrategy();
   }
 
   const props = {
@@ -39,7 +39,7 @@ function App() {
     logout,
   };
 
-  return loginState.render(props);
+  return loginStrategy.render(props);
 }
 
 export default App;
