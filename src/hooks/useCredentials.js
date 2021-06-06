@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react';
 
 function getCredentials() {
-  const credentialsJson = localStorage.getItem('credentials');
-  return JSON.parse(credentialsJson);
+  return JSON.parse(localStorage.getItem('credentials'));
 }
 
 function useCredentials() {
